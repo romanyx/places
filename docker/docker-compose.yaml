@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  places:
+    image: romanyx/places:latest
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "1234:1234"
+    command: ["-redis=redis:6379", "-jaeger=http://jaeger:14268"]
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+

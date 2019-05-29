@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: "places-metrics"
+    scrape_interval: 15s
+    static_configs:
+      - targets: [
+       "places:8082"
+      ]
