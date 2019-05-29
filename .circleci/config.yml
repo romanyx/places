@@ -1,0 +1,61 @@
+version: 2
+jobs:
+  test:
+    machine:
+      image: circleci/classic:latest
+      environment:
+        GO111MODULE: "on"
+    steps:  
+      - add_ssh_keys:
+          fingerprints:
+            - "40:6f:87:6f:2f:2a:8e:31:aa:4e:a3:37:e4:64:7a:86"
+      - checkout
+      - run:
+          name: Install golang
+          command: |
+            sudo rm -rf /usr/local/go
+            wget -c https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
+            sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
+            export PATH=$PATH:/usr/local/go/bin
+      - run:
+          name: Download dependencies
+          command: go mod download
+      - run:
+          name: Run tests
+          command: make test
+  publish:
+    docker:
+      - image: circleci/buildpack-deps:latest
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "40:6f:87:6f:2f:2a:8e:31:aa:4e:a3:37:e4:64:7a:86"
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build image
+          command: |
+            TAG=0.0.$CIRCLE_BUILD_NUM
+            docker build -t romanyx/places:$TAG -f docker/Dockerfile .
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            TAG=0.0.$CIRCLE_BUILD_NUM
+            docker tag romanyx/places:$TAG romanyx/places:latest
+            docker login -u=$DOCKERHUB_USER -p=$DOCKERHUB_PASSWORD
+            docker push romanyx/places
+  
+workflows:
+  version: 2
+  test_and_publish:
+    jobs:
+      - test
+      - publish:
+          context: docker-hub
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+
+

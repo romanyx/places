@@ -1,0 +1,32 @@
+{
+    "DisableAll": true,
+    "Enable": [
+        "deadcode",
+        "dupl",
+        "gosec",
+        "goconst",
+        "gofmt",
+        "goimports",
+        "golint",
+        "gosimple",
+        "gotype",
+        "interfacer",
+        "ineffassign",
+        "misspell",
+        "megacheck",
+        "nakedret",
+        "structcheck",
+        "staticcheck",
+        "testify",
+        "unconvert",
+        "unparam",
+        "varcheck",
+        "vet",
+        "vetshadow"
+    ],
+    "Linters": {
+        "gosec": {
+            "Command": "gosec -exclude=G501 -fmt=csv"
+        }
+    }
+}
