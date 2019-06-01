@@ -66,7 +66,7 @@ type Service struct {
 // TODO(romanyx): Think about idea that first step should be
 // cache retrieve and only then, if cache found - there should
 // be timeout for request, otherwise when cache is not found in
-// a storage request should be without timeout.
+// the storage request should be without timeout.
 func (s *Service) Search(ctx context.Context, p Params) ([]place.Model, error) {
 	spanCtx := trace.FromContext(ctx).SpanContext()
 	ctx, cancel := context.WithTimeout(ctx, s.timeout)

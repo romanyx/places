@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
+	"github.com/romanyx/places/internal/broker"
 	"github.com/romanyx/places/internal/place"
 	"github.com/romanyx/places/internal/storage"
 )
@@ -60,6 +61,14 @@ func TestServiceSearch(t *testing.T) {
 				return nil, context.Canceled
 			},
 			repoFunc: func(m *MockRepository) {},
+		},
+		{
+			name: "bad request",
+			requesterFunc: func(ctx context.Context, p Params) ([]place.Model, error) {
+				return nil, broker.ErrBadRequest
+			},
+			repoFunc:  func(m *MockRepository) {},
+			expectErr: true,
 		},
 	}
 

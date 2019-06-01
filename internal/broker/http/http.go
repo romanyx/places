@@ -9,7 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/trace"
 
 	"github.com/romanyx/places/internal/broker"
@@ -41,11 +40,11 @@ func newSearchHandler(searcher Searcher) http.Handler {
 		Searcher: searcher,
 	}
 
-	h := httpHandler{&searchHandler}
-	return &h
+	h := httpHandler{searchHandler}
+	return h
 }
 
-func (h *searchHandler) Handle(w http.ResponseWriter, r *http.Request) error {
+func (h searchHandler) Handle(w http.ResponseWriter, r *http.Request) error {
 	if r.Method != http.MethodGet {
 		return methodNotAllowedResponse(w)
 	}
@@ -93,8 +92,7 @@ func NewServer(addr string, searcher Searcher) *http.Server {
 	s := http.Server{
 		Addr: addr,
 		Handler: &ochttp.Handler{
-			Handler:     mux,
-			Propagation: &b3.HTTPFormat{},
+			Handler: mux,
 		},
 		ReadTimeout:  timeout,
 		WriteTimeout: timeout,
@@ -109,7 +107,7 @@ type httpHandler struct {
 }
 
 // ServeHTTP implements http.Handler.
-func (h *httpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h httpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := h.Handle(w, r); err != nil {
 		spanCtx := trace.FromContext(r.Context()).SpanContext()
 		log.Error(errors.Wrap(err, "serve http"), map[string]interface{}{
