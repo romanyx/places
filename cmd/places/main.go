@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
@@ -132,15 +131,7 @@ func main() {
 		}
 	}()
 
-	// TODO(romanyx): fast fix for docker-compose.
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
-
+	client := http.Client{}
 	// Start API server.
 	server := setupServer(*addr, &client, redis)
 
